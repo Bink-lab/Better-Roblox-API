@@ -40,8 +40,8 @@ This project is a FastAPI-based application that allows users to fetch informati
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd genner
+   git clone https://github.com/Bink-lab/Better-Roblox-API
+   cd Better-Roblox-API
    ```
 
 2. Install dependencies:
@@ -55,16 +55,6 @@ This project is a FastAPI-based application that allows users to fetch informati
    ```
 
 4. Access the API at `http://127.0.0.1:8000`.
-
-## Project Structure
-
-```
-genner/
-├── main.py          # FastAPI application and routing
-├── roblox_api.py    # Functions for interacting with Roblox APIs
-├── requirements.txt # Project dependencies
-└── README.md        # Project documentation
-```
 
 ## Notes
 
