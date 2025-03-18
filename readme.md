@@ -33,7 +33,7 @@ This project is a FastAPI-based application that allows users to fetch informati
   "id": 3407,
   "name": "bananaboy",
   "displayName": "Bananaboy",
-  "description": "Sup I'm bananaboy not "bananaboy123" Or "bananaboy6362" any of those I'm bananaboy with no numbers in it so im the original bananaboy",
+  "description": "Example description",
   "isBanned": false,
   "thumbnailUrl": "https://tr.rbxcdn.com/30DAY-Avatar-FF4691BD3BF0CD0B98A4923029C73C29-Png/720/720/Avatar/Png/noFilter",
   "presence": 2,
