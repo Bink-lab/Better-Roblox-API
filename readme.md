@@ -7,6 +7,7 @@ This project is a FastAPI-based application that allows users to fetch informati
 - Fetch basic user information (ID, name, display name, description, ban status).
 - Fetch user information using either `userid` or `username`.
 - Fetch the user's avatar thumbnail URL.
+- Track user presence status (online, offline, in-game, etc.).
 
 ## Endpoints
 
@@ -21,8 +22,8 @@ This project is a FastAPI-based application that allows users to fetch informati
 **Note:** Either `userid` or `username` must be provided.
 
 **Example Requests:**
-- Fetch by `userid`: `http://127.0.0.1:8000/account/info?userid=724054979`
-- Fetch by `username`: `http://127.0.0.1:8000/account/info?username=Nexoyxyz`
+- Fetch by `userid`: `http://127.0.0.1:8000/account/info?userid=3407`
+- Fetch by `username`: `http://127.0.0.1:8000/account/info?username=bananaboy`
 
 **Example Response:**
 ```json
@@ -32,9 +33,19 @@ This project is a FastAPI-based application that allows users to fetch informati
   "displayName": "Bananaboy",
   "description": "Sup I'm bananaboy not “bananaboy123” Or “bananaboy6362” any of those I'm bananaboy with no numbers in it so im the original bananaboy",
   "isBanned": false,
-  "thumbnailUrl": "https://tr.rbxcdn.com/30DAY-Avatar-FF4691BD3BF0CD0B98A4923029C73C29-Png/720/720/Avatar/Png/noFilter"
+  "thumbnailUrl": "https://tr.rbxcdn.com/30DAY-Avatar-FF4691BD3BF0CD0B98A4923029C73C29-Png/720/720/Avatar/Png/noFilter",
+  "presence": 2
 }
 ```
+
+### Presence Values
+
+The `presence` field in the response indicates the user's current online status:
+- `0`: Offline
+- `1`: Online
+- `2`: In-game
+- `3`: In Studio
+- `4`: In-game (Playing Studio)
 
 ## Setup Instructions
 
