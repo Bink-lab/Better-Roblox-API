@@ -45,6 +45,48 @@ async def get_username_history(userid: int, limit: int = 10):
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch username history: {str(e)}")
 
+async def get_follower_count(userid: int):
+    try:
+        followers_url = f"https://friends.roblox.com/v1/users/{userid}/followers/count"
+        followers_response = requests.get(followers_url)
+        followers_response.raise_for_status()
+        followers_data = followers_response.json()
+        if "count" in followers_data:
+            return followers_data["count"]
+        else:
+            return 0
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch follower count: {str(e)}")
+    
+
+async def get_friends_count(userid: int):
+    try:
+        friends_count_url = f"https://friends.roblox.com/v1/users/{userid}/friends/count"
+        friends_count_response = requests.get(friends_count_url)
+        friends_count_response.raise_for_status()
+        friends_count_data = friends_count_response.json()
+
+        if "count" in friends_count_data:
+            return friends_count_data["count"]
+        else:
+            return 0
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch friends count: {str(e)}")
+
+async def get_user_games(userid: int, limit: int = 10):
+    try:
+        games_url = f"https://games.roblox.com/v2/users/{userid}/games?accessFilter=2&limit={limit}&sortOrder=Asc"
+        games_response = requests.get(games_url)
+        games_response.raise_for_status()
+        games_data = games_response.json()
+
+        if "data" in games_data:
+            return games_data["data"]
+        else:
+            return []
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch user games: {str(e)}")
+
 async def get_user_details(userid: int):
     user_info = {
         "id": userid,
@@ -93,6 +135,22 @@ async def get_user_details(userid: int):
         user_info["errors"].append(f"Failed to fetch presence: {str(e)}")
         user_info["presence"] = 0  # Default to offline
 
+    # Fetch follower count - non-essential
+    try:
+        follower_count = await get_follower_count(userid)
+        user_info["followerCount"] = follower_count
+    except Exception as e:
+        user_info["errors"].append(f"Failed to fetch follower count: {str(e)}")
+        user_info["followerCount"] = 0
+
+    # Fetch friends count - non-essential
+    try:
+        friends_count = await get_friends_count(userid)
+        user_info["friendsCount"] = friends_count
+    except Exception as e:
+        user_info["errors"].append(f"Failed to fetch friends count: {str(e)}")
+        user_info["friendsCount"] = 0
+
     # Fetch username history - non-essential
     try:
         username_history = await get_username_history(userid)
@@ -100,5 +158,14 @@ async def get_user_details(userid: int):
     except Exception as e:
         user_info["errors"].append(f"Failed to fetch username history: {str(e)}")
         user_info["usernameHistory"] = []
+    
+    # Fetch user games - non-essential
+    try:
+        user_games = await get_user_games(userid)
+        user_info["games"] = user_games
+    except Exception as e:
+        user_info["errors"].append(f"Failed to fetch user games: {str(e)}")
+        user_info["games"] = []
+
 
     return user_info

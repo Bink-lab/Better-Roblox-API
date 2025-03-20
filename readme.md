@@ -1,10 +1,9 @@
 # Roblox User Info API
 
-This project is a FastAPI-based application that allows users to fetch information about Roblox users using either their `userid` or `username`. The API also includes support for fetching the user's avatar thumbnail.
+This project is a FastAPI-based application that allows users to fetch information about Roblox users using either their `userid` or `username`.
 
 ## Features
 
-- Fetch basic user information (ID, name, display name, description, ban status).
 - Fetch user information using either `userid` or `username`.
 - Fetch the user's avatar thumbnail URL.
 - Track user presence status (online, offline, in-game, etc.).
@@ -37,6 +36,7 @@ This project is a FastAPI-based application that allows users to fetch informati
   "isBanned": false,
   "thumbnailUrl": "https://tr.rbxcdn.com/30DAY-Avatar-FF4691BD3BF0CD0B98A4923029C73C29-Png/720/720/Avatar/Png/noFilter",
   "presence": 2,
+  
   "usernameHistory": ["previousUsername1", "previousUsername2"],
   "errors": []
 }
@@ -66,17 +66,19 @@ The API includes built-in error handling for various scenarios:
    cd Better-Roblox-API
    ```
 
-2. Install dependencies:
+- Or, if you would rather get access to the latest features, use the [Unreleased](https://github.com/Bink-lab/Better-Roblox-API/tree/Unreleased) branch.
+
+1. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Run the application:
+2. Run the application:
    ```bash
    uvicorn main:app --reload
    ```
 
-4. Access the API at `http://127.0.0.1:8000`.
+3. Access the API at `http://127.0.0.1:8000`.
 
 ## Notes
 
