@@ -29,16 +29,19 @@ This project is a FastAPI-based application that allows users to fetch informati
 **Example Response:**
 ```json
 {
+{
   "id": 3407,
+  "errors": [],
   "name": "bananaboy",
   "displayName": "Bananaboy",
-  "description": "Example description",
+  "description": "Sup I'm bananaboy not “bananaboy123”\nOr “bananaboy6362” any of those I'm bananaboy with no numbers in it so im the original bananaboy",
   "isBanned": false,
   "thumbnailUrl": "https://tr.rbxcdn.com/30DAY-Avatar-FF4691BD3BF0CD0B98A4923029C73C29-Png/720/720/Avatar/Png/noFilter",
-  "presence": 2,
-  
-  "usernameHistory": ["previousUsername1", "previousUsername2"],
-  "errors": []
+  "presence": 0,
+  "followerCount": 246,
+  "friendsCount": 106,
+  "usernameHistory": []
+}
 }
 ```
 
