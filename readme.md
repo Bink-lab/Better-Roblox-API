@@ -9,6 +9,11 @@ This project is a FastAPI-based application that allows users to fetch informati
 - Track user presence status (online, offline, in-game, etc.).
 - Retrieve username history (past usernames).
 - Error handling for API requests.
+- Access to user profile description.
+- Display name retrieval (separate from username).
+- Ban status checking.
+- Follower count statistics.
+- Friends count statistics.
 
 ## Endpoints
 
