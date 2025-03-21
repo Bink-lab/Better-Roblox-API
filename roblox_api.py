@@ -1,11 +1,11 @@
 from fastapi import HTTPException
-from proxy_manager import get, post
+from proxy_manager import get, post  # Import async get and post
 
 async def get_user_id_from_username(username: str):
     try:
         url = "https://users.roblox.com/v1/usernames/users"
         payload = {"usernames": [username], "excludeBannedUsers": True}
-        response = post(url, json=payload)
+        response = await post(url, json=payload)
         response.raise_for_status()
         data = response.json()
 
@@ -20,9 +20,9 @@ async def get_user_presence(userid: int):
     try:
         presence_url = "https://presence.roblox.com/v1/presence/users"
         payload = {"userIds": [userid]}
-        presence_response = post(presence_url, json=payload)
-        presence_response.raise_for_status()
-        presence_data = presence_response.json()
+        response = await post(presence_url, json=payload)
+        response.raise_for_status()
+        presence_data = response.json()
 
         if presence_data and presence_data["userPresences"]:
             return presence_data["userPresences"][0]["userPresenceType"]
@@ -34,9 +34,9 @@ async def get_user_presence(userid: int):
 async def get_username_history(userid: int, limit: int = 10):
     try:
         history_url = f"https://users.roblox.com/v1/users/{userid}/username-history?limit={limit}"
-        history_response = get(history_url)
-        history_response.raise_for_status()
-        history_data = history_response.json()
+        response = await get(history_url)
+        response.raise_for_status()
+        history_data = response.json()
 
         if history_data and "data" in history_data:
             return [entry["name"] for entry in history_data["data"]]
@@ -48,23 +48,22 @@ async def get_username_history(userid: int, limit: int = 10):
 async def get_follower_count(userid: int):
     try:
         followers_url = f"https://friends.roblox.com/v1/users/{userid}/followers/count"
-        followers_response = get(followers_url)
-        followers_response.raise_for_status()
-        followers_data = followers_response.json()
+        response = await get(followers_url)
+        response.raise_for_status()
+        followers_data = response.json()
         if "count" in followers_data:
             return followers_data["count"]
         else:
             return 0
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch follower count: {str(e)}")
-    
 
 async def get_friends_count(userid: int):
     try:
         friends_count_url = f"https://friends.roblox.com/v1/users/{userid}/friends/count"
-        friends_count_response = get(friends_count_url)
-        friends_count_response.raise_for_status()
-        friends_count_data = friends_count_response.json()
+        response = await get(friends_count_url)
+        response.raise_for_status()
+        friends_count_data = response.json()
 
         if "count" in friends_count_data:
             return friends_count_data["count"]
@@ -76,9 +75,9 @@ async def get_friends_count(userid: int):
 async def get_user_games(userid: int, limit: int = 10):
     try:
         games_url = f"https://games.roblox.com/v2/users/{userid}/games?accessFilter=2&limit={limit}&sortOrder=Asc"
-        games_response = get(games_url)
-        games_response.raise_for_status()
-        games_data = games_response.json()
+        response = await get(games_url)
+        response.raise_for_status()
+        games_data = response.json()
 
         if "data" in games_data:
             return games_data["data"]
@@ -90,9 +89,9 @@ async def get_user_games(userid: int, limit: int = 10):
 async def get_user_following_count(userid: int):
     try:
         following_url = f"https://friends.roblox.com/v1/users/{userid}/followings/count"
-        following_response = get(following_url)
-        following_response.raise_for_status()
-        following_data = following_response.json()
+        response = await get(following_url)
+        response.raise_for_status()
+        following_data = response.json()
 
         if "count" in following_data:
             return following_data["count"]
@@ -110,7 +109,7 @@ async def get_user_details(userid: int):
     # Fetch basic profile data - this is essential
     try:
         profile_url = f"https://users.roblox.com/v1/users/{userid}"
-        profile_response = get(profile_url)
+        profile_response = await get(profile_url)
         profile_response.raise_for_status()
         profile_data = profile_response.json()
         
@@ -128,9 +127,9 @@ async def get_user_details(userid: int):
     # Fetch thumbnail URL - non-essential
     try:
         thumbnail_url = f"https://thumbnails.roblox.com/v1/users/avatar?userIds={userid}&size=720x720&format=Png&isCircular=false"
-        thumbnail_response = get(thumbnail_url)
-        thumbnail_response.raise_for_status()
-        thumbnail_data = thumbnail_response.json()
+        response = await get(thumbnail_url)
+        response.raise_for_status()
+        thumbnail_data = response.json()
 
         thumbnail_image_url = None
         if thumbnail_data and thumbnail_data["data"]:
@@ -188,6 +187,5 @@ async def get_user_details(userid: int):
     except Exception as e:
         user_info["errors"].append(f"Failed to fetch user games: {str(e)}")
         user_info["games"] = []
-
 
     return user_info

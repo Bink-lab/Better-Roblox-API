@@ -1,14 +1,14 @@
+import os
+import configparser
+import logging
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from roblox_api import get_user_id_from_username, get_user_details
 from proxy_manager import proxy_manager
 from rate_limiter import rate_limiter
-import os
-import configparser
-import logging
 
 # Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("main")
 
 app = FastAPI()

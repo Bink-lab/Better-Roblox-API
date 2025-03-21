@@ -1,14 +1,14 @@
 import random
 from typing import List, Dict, Optional, Union
 import os
-import requests
 import configparser
 import re
 import time
 import logging
+import httpx  # Import httpx
 
 # Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("proxy_manager")
 
 class ProxyManager:
@@ -26,7 +26,6 @@ class ProxyManager:
         self.load_config()
     
     def load_config(self):
-        """Load configuration from settings.config file"""
         config = configparser.ConfigParser()
         config_path = os.path.join(os.path.dirname(__file__), 'settings.config')
         
@@ -46,11 +45,9 @@ class ProxyManager:
                     self.load_from_file(proxy_file)
     
     def enable(self, enabled: bool = True) -> None:
-        """Enable or disable proxy usage."""
         self.enabled = enabled
     
     def add_proxy(self, proxy: str) -> None:
-        """Add a single proxy to the pool."""
         if proxy and proxy not in self.proxies:
             # Format proxy string if not already formatted
             if not proxy.startswith(('http://', 'https://', 'socks4://', 'socks5://')):
@@ -60,19 +57,16 @@ class ProxyManager:
             logger.debug(f"Added proxy: {proxy}")
     
     def add_proxies(self, proxies: List[str]) -> None:
-        """Add multiple proxies to the pool."""
         for proxy in proxies:
             self.add_proxy(proxy)
     
     def load_from_file(self, filepath: str) -> None:
-        """Load proxies from a file (one proxy per line)."""
         if os.path.exists(filepath):
             with open(filepath, 'r') as f:
                 proxies = [line.strip() for line in f if line.strip() and not line.strip().startswith('#')]
                 self.add_proxies(proxies)
     
     def get_proxy(self) -> Optional[Dict[str, str]]:
-        """Get the next proxy in rotation format for requests."""
         if not self.enabled or not self.proxies:
             return None
             
@@ -113,7 +107,6 @@ class ProxyManager:
             return {"http": proxy, "https": proxy}
     
     def mark_proxy_failed(self, proxy_config: Dict[str, str]) -> None:
-        """Mark a proxy as failed"""
         if not proxy_config:
             return
             
@@ -133,10 +126,12 @@ class ProxyManager:
         if failures >= self.max_failures:
             logger.warning(f"Proxy {proxy_url} temporarily blacklisted after {failures} failures")
     
-    def make_request(self, method: str, url: str, **kwargs) -> requests.Response:
+    async def make_request(self, method: str, url: str, **kwargs) -> httpx.Response:
         """Make a request using a proxy from the pool if enabled."""
         if not self.enabled:
-            return requests.request(method, url, **kwargs)
+            async with httpx.AsyncClient() as client:
+                response = await client.request(method, url, **kwargs)
+                return response
             
         # Try with proxy first
         proxy = self.get_proxy()
@@ -145,31 +140,37 @@ class ProxyManager:
                 kwargs["proxies"] = proxy
                 kwargs["timeout"] = kwargs.get("timeout", 10)  # Set a default timeout
                 
-                response = requests.request(method, url, **kwargs)
-                response.raise_for_status()
-                return response
-            except (requests.RequestException, ConnectionResetError, ConnectionError) as e:
+                async with httpx.AsyncClient() as client:
+                    response = await client.request(method, url, **kwargs)
+                    response.raise_for_status()
+                    return response
+            except (httpx.RequestError, httpx.ConnectError, httpx.ReadTimeout) as e:
                 logger.warning(f"Proxy request failed: {str(e)}")
                 self.mark_proxy_failed(proxy)
                 
                 # Fall back to direct connection if configured
                 if self.direct_fallback:
                     logger.info("Falling back to direct connection")
-                    return requests.request(method, url, **{k: v for k, v in kwargs.items() if k != 'proxies'})
+                    async with httpx.AsyncClient() as client:
+                        kwargs.pop('proxies', None)
+                        response = await client.request(method, url, **kwargs)
+                        return response
                 else:
                     # Try another proxy from the pool
-                    return self.make_request(method, url, **{k: v for k, v in kwargs.items() if k != 'proxies'})
+                    return await self.make_request(method, url, **{k: v for k, v in kwargs.items() if k != 'proxies'})
         else:
             # No available proxy, make direct request
             logger.info("No available proxies, making direct request")
-            return requests.request(method, url, **kwargs)
+            async with httpx.AsyncClient() as client:
+                response = await client.request(method, url, **kwargs)
+                return response
 
 # Global instance
 proxy_manager = ProxyManager()
 
 # Proxy-enabled request methods
-def get(url, **kwargs):
-    return proxy_manager.make_request("GET", url, **kwargs)
+async def get(url, **kwargs):
+    return await proxy_manager.make_request("GET", url, **kwargs)
 
-def post(url, **kwargs):
-    return proxy_manager.make_request("POST", url, **kwargs)
+async def post(url, **kwargs):
+    return await proxy_manager.make_request("POST", url, **kwargs)
