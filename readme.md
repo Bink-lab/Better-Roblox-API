@@ -85,16 +85,28 @@ The API includes built-in error handling for various scenarios:
    ```
 
 3. Configure the application (optional):
-   - Create a `settings.config` file with the following structure:
-     ```ini
-     [ProxySettings]
-     use_proxies = false
-     proxy_file = proxies.txt
 
-     [ApiSettings]
-     rate_limit = 60
-     ```
-   - Set `use_proxies` to `true` to enable proxy usage
+   - **Configuration File:**
+     - Create a `settings.config` file based on the provided example.
+     - Edit the `settings.config` file to match your desired configuration.
+       ```ini
+       [ProxySettings]
+       use_proxies = false
+       proxy_file = proxies.txt
+
+       [ApiSettings]
+       rate_limit = 60
+       ```
+     - Set `use_proxies` to `true` to enable proxy usage.
+   - **Proxy List:**
+     - Create a `proxies.txt` file (or any name specified in `settings.config`)
+     - Add your proxies, one per line, following the format in `proxies.txt.sample`.
+       ```
+       http://username:password@proxy.example.com:8080
+       https://proxy2.example.com:8080
+       socks5://username:password@socks-proxy.example.com:1080
+       socks4://socks-proxy.example.com:1080
+       ```
 
 4. Run the application:
    ```bash
