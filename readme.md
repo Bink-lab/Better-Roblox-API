@@ -14,6 +14,9 @@ This project is a FastAPI-based application that allows users to fetch informati
 - Ban status checking.
 - Follower count statistics.
 - Friends count statistics.
+- Optional proxy support for distributing API requests.
+- Support for HTTP, HTTPS, and SOCKS proxies.
+- IP-based rate limiting to prevent abuse.
 
 ## Endpoints
 
@@ -76,17 +79,97 @@ The API includes built-in error handling for various scenarios:
 
 - Or, if you would rather get access to the latest features, use the [Unreleased](https://github.com/Bink-lab/Better-Roblox-API/tree/Unreleased) branch.
 
-1. Install dependencies:
+2. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. Run the application:
+3. Configure the application (optional):
+
+   - **Configuration File:**
+     - Create a `settings.config` file based on the provided example.
+     - Edit the `settings.config` file to match your desired configuration.
+       ```ini
+       [ProxySettings]
+       use_proxies = false
+       proxy_file = proxies.txt
+
+       [ApiSettings]
+       rate_limit = 60
+       ```
+     - Set `use_proxies` to `true` to enable proxy usage.
+   - **Proxy List:**
+     - Create a `proxies.txt` file (or any name specified in `settings.config`)
+     - Add your proxies, one per line, following the format in `proxies.txt.sample`.
+       ```
+       http://username:password@proxy.example.com:8080
+       https://proxy2.example.com:8080
+       socks5://username:password@socks-proxy.example.com:1080
+       socks4://socks-proxy.example.com:1080
+       ```
+
+4. Run the application:
    ```bash
    uvicorn main:app --reload
    ```
 
-3. Access the API at `http://127.0.0.1:8000`.
+5. Access the API at `http://127.0.0.1:8000`.
+
+## Proxy Configuration
+
+This API supports the use of proxies to distribute requests and avoid rate limits. To use proxies:
+
+1. Create a `settings.config` file as shown above, setting `use_proxies = true`
+2. Add proxy URLs to `proxies.txt` (one URL per line) in the format:
+   ```
+   http://username:password@proxy.example.com:8080
+   https://proxy2.example.com:8080
+   socks5://username:password@socks-proxy.example.com:1080
+   socks4://socks-proxy.example.com:1080
+   ```
+   
+   Note: If you don't specify a protocol, HTTP will be used by default.
+
+3. You can also set proxies via environment variable:
+   ```bash
+   export ROBLOX_API_PROXIES="http://proxy1.com:8080,socks5://proxy2.com:1080"
+   ```
+
+4. Advanced proxy settings in `settings.config`:
+   ```ini
+   [ProxySettings]
+   use_proxies = true
+   proxy_file = proxies.txt
+   direct_fallback = true  # Fall back to direct connection if all proxies fail
+   max_failures = 3        # Number of failures before temporarily blacklisting a proxy
+   blacklist_time = 300    # Time in seconds to blacklist a failing proxy (5 minutes)
+   ```
+
+The proxy system is designed with smart fallback:
+- If a proxy fails, the system will try another one
+- Repeatedly failing proxies are temporarily blacklisted
+- If all proxies are unavailable and `direct_fallback` is enabled, the API will use a direct connection
+
+**Note:** The proxy feature is designed to distribute requests responsibly. Even with proxies enabled, please use this API responsibly to avoid excessive requests to Roblox services.
+
+## Rate Limiting
+
+The API includes IP-based rate limiting to prevent abuse:
+
+- Each IP address is limited to a configurable number of requests per minute
+- When the limit is reached, requests will receive a 429 status code
+- Rate limit information is included in response headers:
+  - `X-RateLimit-Limit`: Maximum allowed requests per minute
+  - `X-RateLimit-Remaining`: Remaining requests for the current window
+  - `X-RateLimit-Reset`: Time in seconds until the rate limit resets
+
+To configure rate limiting, add the following to your `settings.config`:
+
+```ini
+[ApiSettings]
+enable_rate_limit = true
+rate_limit = 60  # Requests per minute per IP address
+```
 
 ## Notes
 
