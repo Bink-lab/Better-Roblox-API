@@ -34,7 +34,6 @@ This project is a FastAPI-based application that allows users to fetch informati
 **Example Response:**
 ```json
 {
-{
   "id": 3407,
   "errors": [],
   "name": "bananaboy",
@@ -43,10 +42,28 @@ This project is a FastAPI-based application that allows users to fetch informati
   "isBanned": false,
   "thumbnailUrl": "https://tr.rbxcdn.com/30DAY-Avatar-FF4691BD3BF0CD0B98A4923029C73C29-Png/720/720/Avatar/Png/noFilter",
   "presence": 0,
-  "followerCount": 246,
+  "followerCount": 247,
+  "followingCount": 56,
   "friendsCount": 106,
-  "usernameHistory": []
-}
+  "usernameHistory": [],
+  "games": [
+    {
+      "id": 6892035272,
+      "name": "Drivin The Systems",
+      "description": null,
+      "creator": {
+        "id": 3407,
+        "type": "User"
+      },
+      "rootPlace": {
+        "id": 137677597076446,
+        "type": "Place"
+      },
+      "created": "2024-12-08T02:39:19.647Z",
+      "updated": "2024-12-08T18:45:12.933Z",
+      "placeVisits": 6
+    }
+  ]
 }
 ```
 
